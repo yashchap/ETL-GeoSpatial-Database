@@ -1,0 +1,131 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        
+    </head>    
+    <body>
+        <div class="container jumbotron">
+            <h1 class="text-center">ETL on GeoSpatial Database</h1>
+            <h3 class="text-center">Select your filter</h3>
+            <br/>
+            <label for="customRange2">Construction Year</label>
+            <input onchange="filter()" type="range" class="custom-range" min="2009" max="2018" id="constyear">
+            <div class="custom-control custom-checkbox">
+                <input onchange="filter()" type="checkbox" class="custom-control-input" value="yes" id="avg">
+                <label class="custom-control-label" for="avg">Average Height Roofx</label>
+            </div>
+            <br>
+                    <div class="custom-control custom-radio">
+                        <input onchange="filter()" type="radio" value="0" id="all" name="customRadio" class="custom-control-input" checked="checked">
+                        <label class="custom-control-label" for="all">ALL</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input onchange="filter()" type="radio" value="2100" id="feet1" name="customRadio" class="custom-control-input">
+                        <label class="custom-control-label" for="feet1">Building</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input onchange="filter()" type="radio" value="5100" id="feet2" name="customRadio" class="custom-control-input">
+                        <label class="custom-control-label" for="feet2">Building Under Construction</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input onchange="filter()" type="radio" value="5110" id="feet3" name="customRadio" class="custom-control-input">
+                        <label class="custom-control-label" for="feet3">Garage</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input onchange="filter()" type="radio" value="2110" id="feet4" name="customRadio" class="custom-control-input">
+                        <label class="custom-control-label" for="feet4">Skybridge</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input onchange="filter()" type="radio" value="1001" id="feet5" name="customRadio" class="custom-control-input">
+                        <label class="custom-control-label" for="feet5">Gas Station Canopy</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input onchange="filter()" type="radio" value="1002" id="feet6" name="customRadio" class="custom-control-input">
+                        <label class="custom-control-label" for="feet6">Storage Tank</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input onchange="filter()" type="radio" value="1003" id="feet7" name="customRadio" class="custom-control-input">
+                        <label class="custom-control-label" for="feet7">Placeholder (triangle for permitted bldg)</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input onchange="filter()" type="radio" value="1004" id="feet8" name="customRadio" class="custom-control-input">
+                        <label class="custom-control-label" for="feet8">Auxiliary Structure (non-addressable, not garage)</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input onchange="filter()" type="radio" value="1005" id="feet9" name="customRadio" class="custom-control-input">
+                        <label class="custom-control-label" for="feet9">Temporary Structure (e.g. construction trailer)</label>
+                    </div>
+            
+        </div>
+
+        <div id="data"></div>
+
+        <script>
+            var endpoint = "/extract";
+            console.log("adqe");
+            $.ajax({
+                url : endpoint,
+                type : 'GET',
+                success : function(data) {              
+                    console.log("Success "+data)
+                },
+                error : function(request,error)
+                {
+                    console.log("Request: "+JSON.stringify(request));
+                }
+            });
+
+            function filter(){
+                _url = "/filter"
+                flag = false;
+                _url += "?constyear=" + $("#constyear").val(); 
+                if(document.getElementById('avg').checked){
+                    _url += "&isheightavg=yes";
+                    flag = true
+                }
+                var radioValue = $("input[name='customRadio']:checked").val();
+                if(radioValue!="0"){
+                    _url += "&featcode="+radioValue;
+                }
+                $.ajax({
+                url : _url,
+                type : 'GET',
+                success : function(data) {              
+                    var res_data = JSON.parse(data);
+                    if(data.Base_bbl=="" || flag){
+                        var htmlstr = "<h4 class='text-center'>First Record of filtered data</h4><table class='table table-dark col-sm-7' style='margin: 0 auto'>";
+                    htmlstr+="<tr><td>Avg Height Roof</td><td>"+res_data.Heightroof+"</td></tr></table>";
+                    }
+                    else if(res_data.Base_bbl!=""){
+                    var htmlstr = "<h4 class='text-center'>First Record of filtered data</h4><table class='table table-dark col-sm-7' style='margin: 0 auto'>";
+                    htmlstr+="<tr><td>Base BBL</td><td>"+res_data.Base_bbl+"</td></tr>";
+                    htmlstr+="<tr><td>Bin</td><td>"+res_data.Bin+"</td></tr>";
+                    htmlstr+="<tr><td>Construction Year</td><td>"+res_data.Cnstrct_yr+"</td></tr>";
+                    htmlstr+="<tr><td>Doitt ID</td><td>"+res_data.Doitt_id+"</td></tr>";
+                    htmlstr+="<tr><td>Feat Code</td><td>"+res_data.Feat_code+"</td></tr>";
+                    htmlstr+="<tr><td>GeomSource</td><td>"+res_data.Geomsource+"</td></tr>";
+                    htmlstr+="<tr><td>Ground Level</td><td>"+res_data.Groundelev+"</td></tr>";
+                    htmlstr+="<tr><td>Height Roof</td><td>"+res_data.Heightroof+"</td></tr>";
+                    htmlstr+="<tr><td>Last Mode Date</td><td>"+res_data.Lstmoddate+"</td></tr>";
+                    htmlstr+="<tr><td>Last Statype</td><td>"+res_data.Lststatype+"</td></tr>";
+                    htmlstr+="<tr><td>Mpluto BBL</td><td>"+res_data.Mpluto_bbl+"</td></tr>";
+                    htmlstr+="<tr><td>Shape Area</td><td>"+res_data.Shape_area+"</td></tr>";
+                    htmlstr+="<tr><td>Shape Lenght</td><td>"+res_data.Shape_len+"</td></tr></table>";
+                    }
+                    else{
+                        var htmlstr = "<div class='text-center'><h5> No records Found!!</h5></div>"
+                    }
+                    $("#data").html(htmlstr);
+
+                },
+                error : function(request,error)
+                {
+                    console.log("Request: "+JSON.stringify(request));
+                 }
+            });
+            }
+        </script>
+    </body>
+</html>
+
