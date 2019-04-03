@@ -18,3 +18,8 @@ Developed an API to extract data from Postgres buildingfootprint table generated
 1) Filter by Construction date.
 2) Filter by FeetCode.
 3) Select whether you want to avg heightroof or not.
+
+![Alt text](https://github.com/yashchap/GO_Internship_Assignment/blob/master/s3.png)
+![Alt text](https://github.com/yashchap/GO_Internship_Assignment/blob/master/s2.png)
+![Alt text](https://github.com/yashchap/GO_Internship_Assignment/blob/master/s1.png)
+
