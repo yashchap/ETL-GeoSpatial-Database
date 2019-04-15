@@ -1,4 +1,4 @@
-# GO_Internship_Assignment
+# ETL on NYC Open Data(url given below)
 
 ### Setup Postgres SQL:
   Create database NYCBuildingFootprint
